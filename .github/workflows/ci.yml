@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -24,4 +24,3 @@ jobs:
       - name: Test
         run: npm test --if-present
         working-directory: ${{ matrix.svc }}
-

@@ -22,7 +22,7 @@ services:
       - /app/products/node_modules
 
     env_file:
-      - ./products/.env.dev
+      - ./products/.env
   shopping:
     build:
       dockerfile: Dockerfile
@@ -37,7 +37,7 @@ services:
       - .:/app
       - /app/shopping/node_modules
     env_file:
-      - ./shopping/.env.dev
+      - ./shopping/.env
   customer:
     build:
       dockerfile: Dockerfile
@@ -53,7 +53,7 @@ services:
       - .:/app/
       - /app/customer/node_modules
     env_file:
-      - ./customer/.env.dev
+      - ./customer/.env
   nginx-proxy:
     build:
       dockerfile: Dockerfile

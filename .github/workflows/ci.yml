@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        svc: [customer, products, shopping]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: ${{ matrix.svc }}/package-lock.json
+      - name: Install
+        run: npm ci
+        working-directory: ${{ matrix.svc }}
+      - name: Test
+        run: npm test --if-present
+        working-directory: ${{ matrix.svc }}
+

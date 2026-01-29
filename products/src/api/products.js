@@ -6,6 +6,13 @@ module.exports = (app, channel) => {
 
   RPCObserver("PRODUCT_RPC", service);
 
+  // Health check endpoint - must be before /:id route
+  app.get("/whoami", (req, res, next) => {
+    return res
+      .status(200)
+      .json({ msg: "/ or /products : I am products Service" });
+  });
+
   app.post("/product/create", async (req, res, next) => {
     const { name, desc, type, unit, price, available, suplier, banner } =
       req.body;
@@ -34,26 +41,10 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.get("/:id", async (req, res, next) => {
-    const productId = req.params.id;
-
-    try {
-      const { data } = await service.GetProductDescription(productId);
-      return res.status(200).json(data);
-    } catch (error) {
-      return res.status(404).json({ error });
-    }
-  });
-
   app.post("/ids", async (req, res, next) => {
     const { ids } = req.body;
     const products = await service.GetSelectedProducts(ids);
     return res.status(200).json(products);
-  });
-  app.get("/whoami", (req, res, next) => {
-    return res
-      .status(200)
-      .json({ msg: "/ or /products : I am products Service" });
   });
 
   //get Top products and category
@@ -61,6 +52,18 @@ module.exports = (app, channel) => {
     //check validation
     try {
       const { data } = await service.GetProducts();
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(404).json({ error });
+    }
+  });
+
+  // This must be last as it catches all /:id patterns
+  app.get("/:id", async (req, res, next) => {
+    const productId = req.params.id;
+
+    try {
+      const { data } = await service.GetProductDescription(productId);
       return res.status(200).json(data);
     } catch (error) {
       return res.status(404).json({ error });

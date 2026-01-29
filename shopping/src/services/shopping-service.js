@@ -14,6 +14,19 @@ class ShoppingService {
       type: "VIEW_PRODUCT",
       data: product_id,
     });
+    
+    // If RPC failed (no message queue), use minimal product data
+    if (!productResponse || productResponse === null) {
+      console.log("RPC unavailable, using minimal product data");
+      const minimalProduct = { _id: product_id, name: "Product", price: 0 };
+      const data = await this.repository.ManageCart(
+        customerId,
+        minimalProduct,
+        qty
+      );
+      return data;
+    }
+    
     if (productResponse && productResponse._id) {
       const data = await this.repository.ManageCart(
         customerId,

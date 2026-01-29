@@ -23,7 +23,7 @@ const StartServer = async() => {
         process.exit();
     })
     .on('close', () => {
-        channel.close();
+        if (channel) channel.close();
     })
     
 

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices API Tester</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #00d4ff; margin-bottom: 30px; }
+        .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .service { background: #16213e; border-radius: 10px; padding: 20px; border: 1px solid #0f3460; }
+        .service h2 { color: #00d4ff; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .service h2 .port { font-size: 12px; background: #0f3460; padding: 3px 8px; border-radius: 5px; }
+        .status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+        .status.online { background: #00ff88; }
+        .status.offline { background: #ff4444; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #aaa; font-size: 14px; }
+        input, button { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #0f3460; background: #1a1a2e; color: #fff; }
+        input:focus { outline: none; border-color: #00d4ff; }
+        button { background: #00d4ff; color: #1a1a2e; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #00a8cc; }
+        button.secondary { background: #0f3460; color: #fff; }
+        button.danger { background: #e94560; }
+        .response { background: #0f3460; border-radius: 5px; padding: 15px; margin-top: 15px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab { padding: 8px 15px; background: #0f3460; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .tab.active { background: #00d4ff; color: #1a1a2e; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .user-info { background: #0f3460; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 13px; }
+        .user-info strong { color: #00d4ff; }
+        .products-grid { display: grid; gap: 10px; margin-top: 10px; }
+        .product-card { background: #1a1a2e; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .product-card .name { font-weight: bold; }
+        .product-card .price { color: #00ff88; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px; background: #1a1a2e; border-radius: 5px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> Microservices API Tester</h1>
+        
+        <div class="services">
+            <!-- Customer Service -->
+            <div class="service">
+                <h2><span class="status" id="customer-status"></span> Customer Service <span class="port">:8001</span></h2>
+                
+                <div class="user-info" id="user-info" style="display: none;">
+                    Logged in as: <strong id="user-email"></strong>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('customer', 'signup')">Sign Up</div>
+                    <div class="tab" onclick="showTab('customer', 'login')">Login</div>
+                    <div class="tab" onclick="showTab('customer', 'profile')">Profile</div>
+                    <div class="tab" onclick="showTab('customer', 'address')">Address</div>
+                </div>
+                
+                <div id="customer-signup" class="tab-content active">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="signup-email" placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="signup-password" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="signup-phone" placeholder="1234567890">
+                    </div>
+                    <button onclick="signup()">Sign Up</button>
+                </div>
+                
+                <div id="customer-login" class="tab-content">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="login-email" placeholder="user@example.com" value="test@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" placeholder="Password" value="Test123!">
+                    </div>
+                    <button onclick="login()">Login</button>
+                </div>
+                
+                <div id="customer-profile" class="tab-content">
+                    <button onclick="getProfile()">Get My Profile</button>
+                </div>
+                
+                <div id="customer-address" class="tab-content">
+                    <div class="form-group">
+                        <label>Street</label>
+                        <input type="text" id="addr-street" placeholder="123 Main St">
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="addr-city" placeholder="New York">
+                    </div>
+                    <div class="form-group">
+                        <label>Postal Code</label>
+                        <input type="text" id="addr-postal" placeholder="10001">
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" id="addr-country" placeholder="USA">
+                    </div>
+                    <button onclick="addAddress()">Add Address</button>
+                </div>
+                
+                <div class="response" id="customer-response">Response will appear here...</div>
+            </div>
+            
+            <!-- Products Service -->
+            <div class="service">
+                <h2><span class="status" id="products-status"></span> Products Service <span class="port">:8002</span></h2>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('products', 'list')">All Products</div>
+                    <div class="tab" onclick="showTab('products', 'create')">Create Product</div>
+                    <div class="tab" onclick="showTab('products', 'category')">By Category</div>
+                </div>
+                
+                <div id="products-list" class="tab-content active">
+                    <button onclick="getProducts()">Load Products</button>
+                    <div class="products-grid" id="products-grid"></div>
+                </div>
+                
+                <div id="products-create" class="tab-content">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="prod-name" placeholder="Product Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="prod-desc" placeholder="Description">
+                    </div>
+                    <div class="form-group">
+                        <label>Type/Category</label>
+                        <input type="text" id="prod-type" placeholder="electronics, footwear, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" id="prod-price" placeholder="99.99">
+                    </div>
+                    <button onclick="createProduct()">Create Product</button>
+                </div>
+                
+                <div id="products-category" class="tab-content">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="cat-type" placeholder="electronics">
+                    </div>
+                    <button onclick="getByCategory()">Search</button>
+                </div>
+                
+                <div class="response" id="products-response">Response will appear here...</div>
+            </div>
+            
+            <!-- Shopping Service -->
+            <div class="service">
+                <h2><span class="status" id="shopping-status"></span> Shopping Service <span class="port">:8003</span></h2>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('shopping', 'cart')">Cart</div>
+                    <div class="tab" onclick="showTab('shopping', 'wishlist')">Wishlist</div>
+                    <div class="tab" onclick="showTab('shopping', 'order')">Order</div>
+                </div>
+                
+                <div id="shopping-cart" class="tab-content active">
+                    <button onclick="getCart()">View Cart</button>
+                    <div id="cart-items"></div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Product ID (copy from Products)</label>
+                        <input type="text" id="cart-product-id" placeholder="Product ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="cart-qty" value="1" min="1">
+                    </div>
+                    <button onclick="addToCart()">Add to Cart</button>
+                </div>
+                
+                <div id="shopping-wishlist" class="tab-content">
+                    <button onclick="getWishlist()">View Wishlist</button>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Product ID</label>
+                        <input type="text" id="wishlist-product-id" placeholder="Product ID">
+                    </div>
+                    <button onclick="addToWishlist()">Add to Wishlist</button>
+                </div>
+                
+                <div id="shopping-order" class="tab-content">
+                    <div class="form-group">
+                        <label>Transaction Number</label>
+                        <input type="text" id="order-txn" placeholder="TXN123456">
+                    </div>
+                    <button onclick="createOrder()">Place Order</button>
+                    <button class="secondary" onclick="getOrders()" style="margin-top: 5px;">View Orders</button>
+                </div>
+                
+                <div class="response" id="shopping-response">Response will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = {
+            customer: 'http://localhost:8001',
+            products: 'http://localhost:8002',
+            shopping: 'http://localhost:8003'
+        };
+        
+        let token = localStorage.getItem('token') || '';
+        let userEmail = localStorage.getItem('userEmail') || '';
+        
+        if (token) {
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('user-email').textContent = userEmail;
+        }
+        
+        // Check service status
+        async function checkStatus() {
+            for (const [service, url] of Object.entries(API)) {
+                try {
+                    await fetch(`${url}/whoami`);
+                    document.getElementById(`${service}-status`).classList.add('online');
+                } catch {
+                    document.getElementById(`${service}-status`).classList.add('offline');
+                }
+            }
+        }
+        checkStatus();
+        
+        function showTab(service, tab) {
+            document.querySelectorAll(`#${service}-${tab}`).forEach(el => el.classList.remove('active'));
+            document.querySelectorAll(`.service:has(#${service}-${tab}) .tab`).forEach(el => el.classList.remove('active'));
+            document.querySelectorAll(`.service .tab-content`).forEach(el => {
+                if (el.id.startsWith(service)) el.classList.remove('active');
+            });
+            document.getElementById(`${service}-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        async function apiCall(service, endpoint, method = 'GET', body = null, auth = false) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (auth && token) {
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            try {
+                const response = await fetch(`${API[service]}${endpoint}`, options);
+                const data = await response.json();
+                document.getElementById(`${service}-response`).textContent = JSON.stringify(data, null, 2);
+                return data;
+            } catch (error) {
+                document.getElementById(`${service}-response`).textContent = `Error: ${error.message}`;
+                return null;
+            }
+        }
+        
+        // Customer functions
+        async function signup() {
+            const data = await apiCall('customer', '/signup', 'POST', {
+                email: document.getElementById('signup-email').value,
+                password: document.getElementById('signup-password').value,
+                phone: document.getElementById('signup-phone').value
+            });
+            if (data?.token) {
+                token = data.token;
+                userEmail = document.getElementById('signup-email').value;
+                localStorage.setItem('token', token);
+                localStorage.setItem('userEmail', userEmail);
+                document.getElementById('user-info').style.display = 'block';
+                document.getElementById('user-email').textContent = userEmail;
+            }
+        }
+        
+        async function login() {
+            const data = await apiCall('customer', '/login', 'POST', {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            });
+            if (data?.token) {
+                token = data.token;
+                userEmail = document.getElementById('login-email').value;
+                localStorage.setItem('token', token);
+                localStorage.setItem('userEmail', userEmail);
+                document.getElementById('user-info').style.display = 'block';
+                document.getElementById('user-email').textContent = userEmail;
+            }
+        }
+        
+        async function getProfile() {
+            await apiCall('customer', '/profile', 'GET', null, true);
+        }
+        
+        async function addAddress() {
+            await apiCall('customer', '/address', 'POST', {
+                street: document.getElementById('addr-street').value,
+                city: document.getElementById('addr-city').value,
+                postalCode: document.getElementById('addr-postal').value,
+                country: document.getElementById('addr-country').value
+            }, true);
+        }
+        
+        // Products functions
+        async function getProducts() {
+            const data = await apiCall('products', '/', 'GET');
+            if (data) {
+                const grid = document.getElementById('products-grid');
+                grid.innerHTML = '';
+                (Array.isArray(data) ? data : [data]).forEach(p => {
+                    if (p._id) {
+                        grid.innerHTML += `
+                            <div class="product-card">
+                                <div>
+                                    <div class="name">${p.name}</div>
+                                    <div style="font-size: 11px; color: #888;">${p._id}</div>
+                                </div>
+                                <div class="price">$${p.price}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+        }
+        
+        async function createProduct() {
+            await apiCall('products', '/product/create', 'POST', {
+                name: document.getElementById('prod-name').value,
+                desc: document.getElementById('prod-desc').value,
+                type: document.getElementById('prod-type').value,
+                price: parseFloat(document.getElementById('prod-price').value),
+                unit: 1,
+                available: true,
+                suplier: "Supplier",
+                banner: "banner.jpg"
+            });
+        }
+        
+        async function getByCategory() {
+            await apiCall('products', `/category/${document.getElementById('cat-type').value}`, 'GET');
+        }
+        
+        // Shopping functions
+        async function getCart() {
+            const data = await apiCall('shopping', '/cart', 'GET', null, true);
+            if (data?.items) {
+                const container = document.getElementById('cart-items');
+                container.innerHTML = '<div style="margin-top: 10px; font-weight: bold;">Cart Items:</div>';
+                data.items.forEach(item => {
+                    container.innerHTML += `
+                        <div class="cart-item">
+                            <span>${item.product?.name || 'Unknown'} x${item.unit}</span>
+                            <span>$${item.product?.price || 0}</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        async function addToCart() {
+            await apiCall('shopping', '/cart', 'POST', {
+                product_id: document.getElementById('cart-product-id').value,
+                qty: parseInt(document.getElementById('cart-qty').value)
+            }, true);
+            getCart();
+        }
+        
+        async function getWishlist() {
+            await apiCall('shopping', '/wishlist', 'GET', null, true);
+        }
+        
+        async function addToWishlist() {
+            await apiCall('shopping', '/wishlist', 'POST', {
+                product_id: document.getElementById('wishlist-product-id').value
+            }, true);
+        }
+        
+        async function createOrder() {
+            await apiCall('shopping', '/order', 'POST', {
+                txnNumber: document.getElementById('order-txn').value
+            }, true);
+        }
+        
+        async function getOrders() {
+            await apiCall('shopping', '/orders', 'GET', null, true);
+        }
+    </script>
+</body>
+</html>

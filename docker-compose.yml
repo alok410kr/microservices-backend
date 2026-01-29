@@ -7,6 +7,17 @@ services:
     container_name: nosql-db
     volumes:
       - ./db/:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
   products:
     build:
       dockerfile: Dockerfile
@@ -17,6 +28,7 @@ services:
     restart: always
     depends_on:
       - "nosql-db"
+      - "rabbitmq"
     volumes:
       - .:/app
       - /app/products/node_modules
@@ -33,6 +45,7 @@ services:
     restart: always
     depends_on:
       - "nosql-db"
+      - "rabbitmq"
     volumes:
       - .:/app
       - /app/shopping/node_modules
@@ -48,7 +61,7 @@ services:
     restart: always
     depends_on:
       - "nosql-db"
-
+      - "rabbitmq"
     volumes:
       - .:/app/
       - /app/customer/node_modules

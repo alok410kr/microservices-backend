@@ -5,8 +5,12 @@ services:
     ports:
       - "8001:8001"
     restart: always
-    env_file:
-      - .env.prod
+    environment:
+      - NODE_ENV=production
+      - PORT=8001
+      - APP_SECRET=${APP_SECRET}
+      - MONGODB_URI=${MONGODB_URI}/customer_db?retryWrites=true&w=majority
+      - MSG_QUEUE_URL=${MSG_QUEUE_URL}
 
   products:
     image: products:latest
@@ -14,8 +18,12 @@ services:
     ports:
       - "8002:8002"
     restart: always
-    env_file:
-      - .env.prod
+    environment:
+      - NODE_ENV=production
+      - PORT=8002
+      - APP_SECRET=${APP_SECRET}
+      - MONGODB_URI=${MONGODB_URI}/products_db?retryWrites=true&w=majority
+      - MSG_QUEUE_URL=${MSG_QUEUE_URL}
 
   shopping:
     image: shopping:latest
@@ -23,8 +31,12 @@ services:
     ports:
       - "8003:8003"
     restart: always
-    env_file:
-      - .env.prod
+    environment:
+      - NODE_ENV=production
+      - PORT=8003
+      - APP_SECRET=${APP_SECRET}
+      - MONGODB_URI=${MONGODB_URI}/shopping_db?retryWrites=true&w=majority
+      - MSG_QUEUE_URL=${MSG_QUEUE_URL}
 
   nginx:
     image: nginx:alpine

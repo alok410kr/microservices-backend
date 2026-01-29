@@ -1,49 +1,30 @@
-version: "3"
 services:
   customer:
-    build:
-      dockerfile: Dockerfile
-      context: ./customer
+    image: customer:latest
     container_name: customer
     ports:
       - "8001:8001"
     restart: always
-    environment:
-      - NODE_ENV=production
-      - PORT=8001
-      - APP_SECRET=1X0+BlYT9F9mAVTymFPyFQ6a8j5nZ0TSHLrrFHzov3E=
-      - MONGODB_URI=mongodb+srv://alok410kr_db_user:alok123@cluster0.pcy0pmf.mongodb.net/customer_db?retryWrites=true&w=majority
-      - MSG_QUEUE_URL=amqps://vueetpuw:E3pqg7K8x4Bqm3LZZSO2kxb4NxyqVqmb@fuji.lmq.cloudamqp.com/vueetpuw
+    env_file:
+      - .env.prod
 
   products:
-    build:
-      dockerfile: Dockerfile
-      context: ./products
+    image: products:latest
     container_name: products
     ports:
       - "8002:8002"
     restart: always
-    environment:
-      - NODE_ENV=production
-      - PORT=8002
-      - APP_SECRET=1X0+BlYT9F9mAVTymFPyFQ6a8j5nZ0TSHLrrFHzov3E=
-      - MONGODB_URI=mongodb+srv://alok410kr_db_user:alok123@cluster0.pcy0pmf.mongodb.net/products_db?retryWrites=true&w=majority
-      - MSG_QUEUE_URL=amqps://vueetpuw:E3pqg7K8x4Bqm3LZZSO2kxb4NxyqVqmb@fuji.lmq.cloudamqp.com/vueetpuw
+    env_file:
+      - .env.prod
 
   shopping:
-    build:
-      dockerfile: Dockerfile
-      context: ./shopping
+    image: shopping:latest
     container_name: shopping
     ports:
       - "8003:8003"
     restart: always
-    environment:
-      - NODE_ENV=production
-      - PORT=8003
-      - APP_SECRET=1X0+BlYT9F9mAVTymFPyFQ6a8j5nZ0TSHLrrFHzov3E=
-      - MONGODB_URI=mongodb+srv://alok410kr_db_user:alok123@cluster0.pcy0pmf.mongodb.net/shopping_db?retryWrites=true&w=majority
-      - MSG_QUEUE_URL=amqps://vueetpuw:E3pqg7K8x4Bqm3LZZSO2kxb4NxyqVqmb@fuji.lmq.cloudamqp.com/vueetpuw
+    env_file:
+      - .env.prod
 
   nginx:
     image: nginx:alpine

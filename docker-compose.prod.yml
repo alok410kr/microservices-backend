@@ -11,6 +11,7 @@ services:
       - APP_SECRET=${APP_SECRET}
       - MONGODB_URI=${MONGODB_URI}/customer_db?retryWrites=true&w=majority
       - MSG_QUEUE_URL=${MSG_QUEUE_URL}
+      - EXCHANGE_NAME=ONLINE_STORE
 
   products:
     image: products:latest
@@ -24,6 +25,7 @@ services:
       - APP_SECRET=${APP_SECRET}
       - MONGODB_URI=${MONGODB_URI}/products_db?retryWrites=true&w=majority
       - MSG_QUEUE_URL=${MSG_QUEUE_URL}
+      - EXCHANGE_NAME=ONLINE_STORE
 
   shopping:
     image: shopping:latest
@@ -37,6 +39,7 @@ services:
       - APP_SECRET=${APP_SECRET}
       - MONGODB_URI=${MONGODB_URI}/shopping_db?retryWrites=true&w=majority
       - MSG_QUEUE_URL=${MSG_QUEUE_URL}
+      - EXCHANGE_NAME=ONLINE_STORE
 
   nginx:
     image: nginx:alpine
